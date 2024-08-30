@@ -1,12 +1,11 @@
 ```json
 {
+"musicId": "1902312410",
   "date": "2023.07.08 23:00",
   "tags": ["ChatGLM2-6b","embedding","pytorch"],
   "description":"因为人工智能的火热，组了一台13700K+4070的主机，想着要拿来跑图和跑模型学习，结果打开了steam下载了只狼嘎嘎炫，还好玩了几天就对游戏失去兴趣了，后面跑图就不说了（各种模型和LORA让人眼花缭乱，狗头.jpg），然后给别人开发了一个对接chatgpt的系统后，觉得要找一个开源本地能跑的LLM玩一玩,然后就发现了清华大学的ChatGLM2-6b，跑起来发现效果还行，这样的话不就可以用最少的代价建立起本地知识库问答机器人了？so 今天我们就研究一下基于AGI的向量实现语义搜索，并给聊天机器人提供更多的上下文从而建立自己的知识库问答机器人。关键词：ChatGLM2-6b、embedding、llama_index、cuda、pytorch"
 }
 ```
-
-
 
 ## 前言
 
@@ -21,8 +20,6 @@
 5. 梯子 。终端也要走，要不然寸步难行。
 
 # 原理
-
-
 
 现在像 openai 和 ChatGLM2-6B 等大模型语言的对话上下文是有 token 限制的，即使是 gpt 4 目前最好的模型好像也是 32k，对于我们的本地资料库，肯定是需要通过语义搜索出相关的段落，将相关段落和用户的提问一起给到语言模型去回答。例如：
 
@@ -44,8 +41,6 @@
 openai 提供了一个接口可以直接生成Embedding，它使用的是 openai-ada-002 模型。我将当前这个博客所有的md文档试了一下，慢不说，还消耗了我的0.2美元。所以我们肯定要使用开源的，下面是部分模型对比。
 
 ![20-12-11-re](./images/ai-models.png)
-
-
 
 现在在huggingface排第一的是GanymedeNil/text2vec-large-chinese，但是我更建议使用m3e-base，text2vec 还不支持英文，注意：m3e-base还不支持代码检索。
 
@@ -93,9 +88,7 @@ https://github.com/UKPLab/sentence-transformers
 
 Embedding（嵌入）是将文本或单词映射到连续向量空间的过程。在自然语言处理中，我们可以使用预训练的词嵌入模型（如Word2Vec、GloVe或BERT）将单词、短语或句子嵌入到低维向量表示中。这种连续向量表示可以捕捉到词语之间的语义和上下文关系。
 
-
 Sentence Similarity（句子相似度）是衡量两个句子之间语义上的相似性或相关性的度量。在自然语言处理任务中，如问答系统、信息检索和文本摘要等应用中，需要判断两个句子之间的相似度。通过将句子嵌入到连续向量空间中，我们可以使用向量之间的相似度度量（如余弦相似度或欧氏距离）来衡量句子的相似性。
-
 
 具体而言，通过将句子转换为嵌入向量，我们可以使用向量之间的距离或相似度来度量两个句子之间的相关性。如果两个句子在嵌入空间中的向量表示相似，那么它们很可能具有相似的含义或语义。因此，通过比较句子的嵌入向量，我们可以计算句子之间的相似度分数，从而评估它们的相关性。
 
@@ -105,11 +98,7 @@ Sentence Similarity（句子相似度）是衡量两个句子之间语义上的�
 
 https://github.com/jerryjliu/llama_index
 
-
-
-
 ## 建立知识库向量
-
 
 默认使用openai 接口，需要设置OPENAI_API_KEY。
 
@@ -139,13 +128,13 @@ index = VectorStoreIndex.from_documents(documents,service_context=service_contex
 index.storage_context.persist()
 
 ```
+
 这样可以在本地简单的建立一个 Embedding storage，如果想要更快的检索可以配合使用FAISS。推荐使用 Facebook 开源的 Faiss 这个 Python 包，它的全称就是 Facebook AI Similarity Search，也就是快速进行高维向量的相似性搜索。
-
-
 
 llama_index 自定义 Embedding 文档地址 `https://github.com/jerryjliu/llama_index/blob/main/docs/how_to/customization/embeddings.md`
 
 查询
+
 ```python
 from llama_index import LangchainEmbedding,ServiceContext
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
@@ -191,11 +180,7 @@ pip install -r requirements.txt
 
 其中 `transformers` 库版本推荐为 `4.30.2`，`torch` 推荐使用 2.0 及以上的版本，以获得最佳的推理性能。
 
-
-
 在使用ChatGLM2-6b时，开源代码提供了 cli_demo.py 可以简单的在终端使用对话，但是如果你是win用户的话，需要安装pyreadline来代替readline包，修改导入为 `import pyreadline as readline`
-
-
 
 ## 20231010补充
 
@@ -213,4 +198,4 @@ https://github.com/qdrant/go-client
 docker run -p 6333:6333 qdrant/qdrant
 ```
 
- 保存向量数据的时候，除了 Vector Data 之外我们还要保存其他一些额外信息（问答、数据ID、引用地址等），这样后续通过向量搜索出来的内容可以快速定位相关内容。
+保存向量数据的时候，除了 Vector Data 之外我们还要保存其他一些额外信息（问答、数据ID、引用地址等），这样后续通过向量搜索出来的内容可以快速定位相关内容。

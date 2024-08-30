@@ -1,5 +1,7 @@
 ```json
+
 {
+"musicId": "28713525",
  "date": "2024.05.13 21:00",
   "tags": ["make","makefile","marewood"]
 }
@@ -16,8 +18,6 @@
 通过运行 `make` 命令并指定一个 `Makefile` 文件，`make` 工具会根据 `Makefile` 中的规则来判断哪些文件需要重新编译，然后自动执行相应的命令，以确保项目的最终目标文件是最新的。
 
 总的来说，`make` 和 `Makefile` 联合起来提供了一种自动化构建和编译项目的方法，使得开发者可以更高效地管理复杂的软件项目。
-
-
 
 ## Makefile 示例
 
@@ -61,9 +61,7 @@ check:
 
 例如需要执行build目标文件运行 `make build`就好了。为什么叫目标文件呢？因为make起初就是拿来生成各种文件的，所以定义了build它真的会去检查是否有这个文件，所以我们需要.PHONY来声明它是一个伪目标。例如`.PHONY: pull build check`表示pull、build、check 都是伪目标，代表一种操作。每一个目标文件(操作)都可能依赖其他目标文件(或者操作)，例如`build:  pull`表示build操作需要依赖pull操作。
 
-
-
- make使用文件的创建和修改时间来判断是否应该更新一个目标文件。例如
+make使用文件的创建和修改时间来判断是否应该更新一个目标文件。例如
 
 ```makefile
 a.text:b.text
@@ -155,8 +153,6 @@ ok:
 	@cd .. && pwd
 ```
 
-
-
 `@for version in $(NODE_VERSIONS); do` 和 `$(foreach version, $(NODE_VERSIONS)` 都可以用于在 Makefile 中进行循环操作，但它们的语法和用法略有不同。
 
 1. `@for version in $(NODE_VERSIONS); do` 使用了 Bash 的 `for` 循环语法，在 Makefile 中使用了 `@` 符号来抑制 Make 工具输出执行命令的信息。这种方式更接近于 Bash 脚本的写法，相对比较直观。
@@ -168,7 +164,6 @@ ok:
            # 这里可以执行具体的命令，例如构建 Docker 镜像等 \
        done
    ```
-
 2. `$(foreach version, $(NODE_VERSIONS)` 是 Makefile 中的内置函数 `foreach`，它的语法比较类似于函数调用，其中第一个参数是迭代变量名，第二个参数是迭代的列表。这种方式更符合 Makefile 的语法习惯，且可以更灵活地在 Makefile 中操作。
 
    ```makefile
@@ -183,8 +178,6 @@ ok:
 
 需要注意的是，在makefile中使用$(BUILD_NODE_IMAGE)来表示一个变量，但是如果是shell语法里面就注意需要使用$$val了
 
-
-
 `make`在执行命令时，会检查每一条命令的返回值，如果返回错误（非0值），就会中断执行。
 
 ```makefile
@@ -195,6 +188,7 @@ ok:
 ```
 
 当ok.txt不存在时：
+
 ```
 rm ok.txt;
 rm: ok.txt: No such file or directory
@@ -208,4 +202,3 @@ ok:
 	-rm ok.txt;
 	echo "ok"
 ```
-
